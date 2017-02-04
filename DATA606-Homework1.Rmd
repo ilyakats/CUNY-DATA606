@@ -1,0 +1,52 @@
+---
+title: "DATA 606 Homework 1"
+author: "Ilya Kats"
+date: "February 3, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+### 1.8 Smoking habits of UK residents.
+
+a. Each row of the data matrix represents a case which in this study is information about one participants.
+b. The study included 1,691 participants.
+c. Variables tracked in the study are as follows:
+    + Sex - categorical
+    + Age - numerical, discrete
+    + Marital status - categorical
+    + Gross income - categorical, ordinal
+    + Smoker - categorical
+    + Cigarettes smoked during weekends - numerical, discrete
+    + Cigarettes smoked during weekdays - numerical, discrete
+
+### 1.10 Cheaters, scope of inference
+
+a. The population is all children between the ages of 5 and 15. The sample is 160 children selected for the study.
+b. Provided the sample is representative of the population the results can be generalized to the population (but sample selection is critical here). This study is an experiment because participants were assigned to two groups - with exlicit instructions and without - so it can be used to establish causal relationship between some variables.
+
+### 1.28 Reading the paper.
+
+a. The study is an observational study and not an experiment; therefore, it cannot be used to establish causal relationship. It can only demonstrate dependency of variables. 
+b. Similarly to above, this study is not an experiment, so the statement that "sleep disorders lead to bullying in school children" is not justified. I believe the more accurate statement would be "The study shows that there is a link between disruptive behavior or bullying and sleep disorders."
+
+### 1.36 Exercise and mental health
+
+a. This study is an experiment.
+b. The treatment group consists of subjects selected to exercise and the control group consists of subjects instructed not to exercise.
+c. Yes. Age is the blocking variable, so subjects are divided into age groups.
+d. No. Each subject knows what group he is in, so the study is not blind.
+e. Since the study is an experiment, it can be used to show causal relationship between exercise and mental health, but only within selected age groups. I believe under 18 and over 55 age groups may show significant differences from selected stratas, so conclusion cannot be generalized to the entire population. 
+f. I would have some reservations about funding this study. I am not sure if it is possible to design this study to make it blind, but that would be desirable. And I think the study should eliminate other factors that may influence mental health.
+
+### 1.48  Stats scores
+
+```{r}
+scores <- c(57, 66, 69, 71, 72, 73, 74, 77, 78, 78, 79, 79, 81, 81, 82, 83, 83, 88, 89, 94)
+quantile(scores)
+
+ggplot() + stat_boxplot(aes(scores, x = 1),geom = "errorbar") + geom_boxplot(aes(scores, x = 1))
+```
