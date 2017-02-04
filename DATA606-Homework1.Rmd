@@ -2,7 +2,9 @@
 title: "DATA 606 Homework 1"
 author: "Ilya Kats"
 date: "February 3, 2017"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -48,5 +50,29 @@ f. I would have some reservations about funding this study. I am not sure if it 
 scores <- c(57, 66, 69, 71, 72, 73, 74, 77, 78, 78, 79, 79, 81, 81, 82, 83, 83, 88, 89, 94)
 quantile(scores)
 
-ggplot() + stat_boxplot(aes(scores, x = 1),geom = "errorbar") + geom_boxplot(aes(scores, x = 1))
+ggplot(, aes(scores, x = 1)) + stat_boxplot(geom = "errorbar") + geom_boxplot() + 
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank()) + labs(y = "Scores")
 ```
+
+### 1.50 Mix-and-match
+
+* Histogram (a) is symmetric and unimodal, matches box plot (2)
+* Histogram (b) is multimodal, matches box plot (3)
+* Histogram (c) is right skewed and unimodal, matches box plot (1)
+
+### 1.56 Distribution and appropriate statistics, Part II
+
+a. The distribution of housing prices is likely __right skewed__ since there is a concetration of house prices around $350,000 - $450,000 with a meaningful number significantly higher. Therefore the center would be best described by the __median__, and variability would be best described by the __IQR__.
+b. The distribution of housing prices is likely __symmetric__ as there is about equal number of houses sold per each $300,000 with just a few outliers past $1,200,000. Therefore the center would be best described by the __mean__, and variability by the __standard deviation__.
+c. The distribution of number of drinks consumed by students is likely __right skewed__ since there is a natural boundary at 0 and most student do not drink with very few students drinking excessively. Therefore the center would be best described by the __meadian__, and variability by the __IQR__.
+d. The way the question is phrased, the distribution of annual salaries of the employees at a Fortune 500 company may be symmetric since there are few outliers and majority of employees should fall close together; however, I think it is more likely that the distribution if __right skewed__ since there are more supporting personnel which early less than management, so as salaries grow the number of employees taper out. If right skewed, the center would be best described by the __meadian__, and variability by the __IQR__.
+
+### 1.70 Heart transplants
+
+a. The mosaic plot clearly shows that larger proportion of treatment patients survived than proportion of survived control patients. Therefore whether or not the patient got a transplant and survival are __dependent__ variables.
+b. The box plot for the control group shows not only that survival was low, but that there was no spread in how many days patients survived. It appears that majority of patients survived less than 100 days with a few outliers, and only 1 patient survived for more than 500 days. The box plot for the treatment group shows much wider distribution with more than half of patients surviving for longer than majority of control patients.
+c. In the treatment group 45 patients died out of 69, so the proportion is 45/69 = 0.65. In the control group 30 patients died out of 34, so the proportion is 30/34 = 0.88.
+d. Randomization technique:
+    i. $\sf{H_{0}}$: The survival of patients and whether or not they got a transplant are independent. They have no relationship, and the difference in survival rates is due to chance. $\sf{H_{A}}$: The survival of patients and whether or not they got a transplant are not independent. The differentce in survival rates is not due to chance, and not getting a transplant readuces your chance of survival.
+    ii. We write _alive_ on __28__ cards representing patiens who were alive at the end of the study, and _dead_ on __75__ cards representing patients who were not. Then, we shuffle these cards and split them into two groups: one group of size __69__ representing treatment, and another group  of size __34__ representing control. We calculate the difference between the proportion of _dead_ cards in the treatment and control groups (treatment - control) and record this value. We repeat this 100 times to build a distribution center at __0__. Lastly, we calculate the fraction of simulations where the simulated differences in proportions are __at least the difference observed in the study outcome, 24/69 - 4/34 = 0.35 - 0.12 = 0.23__. If this fraction is low, we conclude that it is unlikely to have observed such an outcome by chance and that the null hypothesis should be rejected in favor of the alternative.
+    iii. The simulation results show that there were only 2 simulations with a difference of at least 23% difference. This indicates a rare event and it is unlikely that the difference in the study outcome is due to chance. Although it is possible that the study demonstrated a rare event, it is unlikely and we should accept the altenative model that transplants increase survival rate of patients. 
