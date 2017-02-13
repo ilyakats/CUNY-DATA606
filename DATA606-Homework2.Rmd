@@ -3,8 +3,8 @@ title: "DATA 606 Homework 2"
 author: "Ilya Kats"
 date: "February 12, 2017"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}

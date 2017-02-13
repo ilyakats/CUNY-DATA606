@@ -3,11 +3,11 @@ title: "Probability"
 author: "Ilya Kats"
 date: "February 12, 2017"
 output:
-  pdf_document: default
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
