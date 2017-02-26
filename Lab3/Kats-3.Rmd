@@ -1,10 +1,13 @@
 ---
 title: "The normal distribution"
+author: "Ilya Kats"
+date: "February 24, 2017"
 output:
+  pdf_document: default
   html_document:
-    theme: cerulean
-    highlight: pygments
     css: ./lab.css
+    highlight: pygments
+    theme: cerulean
 ---
 
 In this lab we'll investigate the probability distribution that is most central
@@ -46,6 +49,17 @@ fdims <- subset(bdims, sex == 0)
 
 1.  Make a histogram of men's heights and a histogram of women's heights.  How 
     would you compare the various aspects of the two distributions?
+
+***
+
+```{r histograms, eval=TRUE}
+hist(mdims$hgt, xlab = "", main = "Histogram of Men's Heights")
+hist(fdims$hgt, xlab = "", main = "Histogram of Women's Heights")
+```
+
+**Both are unimodal distributions, somewhat symmetrical, that appear normal - at least close enough to investigate further. There is a peak with majority of values around it with fewer values as we move away from the peak that make up two tails. The peak is more prominent in the histogram of men's heights.**
+
+***
 
 ## The normal distribution
 
@@ -99,6 +113,11 @@ the histogram function: `ylim = c(0, 0.06)`.
 2.  Based on the this plot, does it appear that the data follow a nearly normal 
     distribution?
 
+***
+
+**Based on the plot, it does appear that the distribution is nearly normal.**
+
+***
 
 ## Evaluating the normal distribution
 
@@ -139,6 +158,17 @@ as well as its normal probability plot.
     the line?  How does this plot compare to the probability plot for the real 
     data?
 
+***
+
+```{r sim-qq, eval=TRUE}
+qqnorm(sim_norm)
+qqline(sim_norm)
+```
+
+**Not all points of the simulated data fall on the line, especially towards the tails. In fact, there are some points that are further away from the line than in the actual data. Comparing the plot for simulated data with the plot for actual data seems to indicate that the distribution is very close to normal.**
+
+***
+
 Even better than comparing the original plot to a single plot generated from a 
 normal distribution is to compare it to many more plots using the following 
 function. It may be helpful to click the zoom button in the plot window.
@@ -151,8 +181,29 @@ qqnormsim(fdims$hgt)
     created for the simulated data?  That is, do plots provide evidence that the
     female heights are nearly normal?
 
+***
+
+**Probability plot for `fdims$hgt` looks very similar to plots created by simulated data. In fact, it looks better than some simulations. I believe plots provide evidence that the female heights are nearly normal.**
+
+***
+
 5.  Using the same technique, determine whether or not female weights appear to 
     come from a normal distribution.
+
+***
+
+```{r qq-fweight, eval=TRUE}
+# Probability plot of female weights
+qqnorm(fdims$wgt)
+qqline(fdims$wgt)
+
+# Comparison of probability plots for actual and simulated data
+qqnormsim(fdims$wgt)
+```
+
+**When reviewing the probability plot of female weights, it appears that the data does not follow the line as closely. Although it is fairly close at the center, the tails move away from the line. More so than in the simulated data. Distribution of weights may not be normal. At the very least it is not nearly normal.**
+
+***
 
 ## Normal probabilities
 
@@ -201,6 +252,27 @@ theoretical probabilities will be.
     as the empirical distribution (four probabilities in all).  Which variable,
     height or weight, had a closer agreement between the two methods?
 
+***
+
+**What is the probability that a randomly chosen young adult female's height is equal to or less than 152 cm? What is the probability that a randomly chosen young adult female's weight is over 80 kg?**
+
+```{r probability-exercise, eval=TRUE}
+# Probability of female under 152 cm (theoretical normal distribution)
+pnorm(q = 152, mean = fhgtmean, sd = fhgtsd)
+
+# Probability of female under 152 cm (empirical)
+sum(fdims$hgt <= 152) / length(fdims$hgt)
+
+# Probability of female over 80 kg (theoretical normal distribution)
+1 - pnorm(q = 80, mean = mean(fdims$wgt), sd = sd(fdims$wgt))
+
+# Probability of female under 80 kg (empirical)
+sum(fdims$wgt > 80) / length(fdims$wgt)
+```
+
+**The difference between theoretical and empirical probabilities when measuring height (0.0246 vs 0.0269) is fairly small, only about 0.002. However, the difference between probability when measuring weight (0.0218 vs 0.0423) is more significant at about 0.02. This is because distribution of heights is much closer to normal distribution than distribution of weights.**
+
+*** 
 * * *
 
 ## On Your Own
@@ -213,19 +285,21 @@ theoretical probabilities will be.
     generate the plots in R to check.
 
     **a.** The histogram for female biiliac (pelvic) diameter (`bii.di`) belongs
-    to normal probability plot letter ____.
+    to normal probability plot letter **B**.
 
     **b.** The histogram for female elbow diameter (`elb.di`) belongs to normal 
-    probability plot letter ____.
+    probability plot letter **C**.
 
     **c.** The histogram for general age (`age`) belongs to normal probability 
-    plot letter ____.
+    plot letter **D**.
 
     **d.** The histogram for female chest depth (`che.de`) belongs to normal 
-    probability plot letter ____.
+    probability plot letter **A**.
 
 -   Note that normal probability plots C and D have a slight stepwise pattern.  
     Why do you think this is the case?
+
+**The stepwise pattern is due to rounding in the collected data. Age is recorded in whole years (plot D) and elbow diameter is recorded in milimeters (plot C). I would have guessed less prominent stepwise pattern for elbow diameter since a milimeter is a fairly small unit; however, variations in elbow diameter are probably not huge in human beings, so even rounding to a milimeter can have a significant effect.**
 
 -   As you can see, normal probability plots can be used both to assess 
     normality and visualize skewness.  Make a normal probability plot for female 
@@ -233,6 +307,18 @@ theoretical probabilities will be.
     variable left skewed, symmetric, or right skewed?  Use a histogram to confirm 
     your findings.
 
+```{r kne-dia-probability, eval=TRUE}
+qqnorm(fdims$kne.di)
+qqline(fdims$kne.di)
+```
+
+**Based on the probability plot the distribution appears to be somewhat skewed to the right.**
+
+```{r kne-dia-hist, eval=TRUE}
+hist(fdims$kne.di, xlab = "", main = "Histogram of Female Knee Diameter")
+```
+
+**Confirmed using histogram.**
 
 ![histQQmatch](more/histQQmatch.png)
 
