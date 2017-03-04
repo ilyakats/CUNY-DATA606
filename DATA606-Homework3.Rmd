@@ -1,0 +1,157 @@
+---
+title: "DATA 606 Homework 3"
+author: "Ilya Kats"
+date: "March 4, 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r results='hide', message=FALSE}
+library('DATA606')
+```
+
+### 3.2 Area under the curve, Part II.
+
+a. $Z > -1.13$:
+The area is $1 - `r pnorm(-1.13)` = `r 1-pnorm(-1.13)`$ or $87.08\%$.
+
+```{r}
+normalPlot(mean = 0, sd = 1, bounds=c(-1.13,4), tails = FALSE)
+```
+
+b. $Z < 0.18$:
+The area is $`r pnorm(0.18)`$ or $57.14\%$.
+
+```{r}
+normalPlot(mean = 0, sd = 1, bounds=c(-4,0.18), tails = FALSE)
+```
+
+c. $Z > 8$:
+The probability of a value in normal distribution being 8 standard deviations away from mean is well under $0.01\%$, so the area is almost nearly $0$.
+
+d. $|Z| < 0.5$:
+The area is $`r pnorm(0.5)` - `r pnorm(-0.5)` = `r pnorm(0.5)-pnorm(-0.5)`$ or $38.3\%$.
+
+```{r}
+normalPlot(mean = 0, sd = 1, bounds=c(-0.5,0.5), tails = FALSE)
+```
+
+### 3.4 Triathlon times, Part I. 
+
+a. Men, Ages 30-34: $N(\mu = 4313, \sigma = 583)$, and Women, Ages 25-29: $N(\mu = 5261, \sigma = 807)$.
+
+
+b. ${Z}_{Leo} = \frac{x - \mu}{\sigma} = \frac{4948 - 4313}{583} \approx 1.0892$ and 
+${Z}_{Mary} = \frac{x - \mu}{\sigma} = \frac{5513 - 5261}{807} \approx 0.3123$; 
+Leo finished the race about 1.09 standad deviations above the mean, while Mary finished the race about 0.31 standard deviations above the mean. 
+
+```{r echo=FALSE}
+x <- seq(-4,4,length=1000)
+y <- dnorm(x, mean=0, sd=1)
+plot(x, y, type='l', xlab="", ylab="")
+abline(h=1, v=1.09, col = "red")
+text(1, 0, "Leo's Z-score", col = "red", adj = c(-0.1, 0.5))
+abline(h=1, v=0.31, col = "blue")
+text(1, 0, "Mary's Z-score", col = "blue", adj = c(1.5, 0.5))
+```
+
+c. Please note that because a better performance corresponds to a faster finish, lower Z-scores correspond to better performance. **Mary ranked better** in her group since her Z-score is better than Leo's.
+
+
+d. `r leop <- pnorm(1.0892)` Leo's Z-score corresponds to probability $`r leop`$. Since higher Z-score corresponds to slower finish, Leo finished faster than $1 - `r leop` = `r 1 - leop`$ or $`r round((1 - leop)*100,2)`\%$.
+
+
+e. `r maryp <- pnorm(0.3123)` Mary's Z-score corresponds to probability $`r maryp`$. Since higher Z-score corresponds to slower finish, Mary finished faster than $1 - `r maryp` = `r 1 - maryp`$ or $`r round((1 - maryp)*100,2)`\%$.
+
+
+f. If distributions are not nearly normal, then part (b) will remain the same since Z-scores can still be calculated. However, parts (d) and (e) rely on the normal model for calculations, so the results would change. 
+
+### 3.18 Heights of female college students.
+
+```{r}
+heights <- c(54, 55, 56, 56, 57, 58, 58, 59, 60, 60, 60, 61, 61, 
+             62, 62, 63, 63, 63, 64, 65, 65, 67, 67, 69, 73)
+hgt_m <- mean(heights)
+hgt_m
+hgt_sd <- sd(heights)
+hgt_sd
+qqnormsim(heights)
+```
+
+Looking at the QQ plots, the plot for actual data mostly follows the line with a few outliers at the edges. It appears better than some QQ plots for simulated data with normal distribution. As such I think we can conclude that the heights data follows a normal distribution. 
+
+```{r}
+# Values one standard deviation away from mean
+pnorm(hgt_m + hgt_sd, mean = hgt_m, sd = hgt_sd) - 
+  pnorm(hgt_m - hgt_sd, mean = hgt_m, sd = hgt_sd)
+# Values two standard deviation away from mean
+pnorm(hgt_m + 2 * hgt_sd, mean = hgt_m, sd = hgt_sd) - 
+  pnorm(hgt_m - 2 * hgt_sd, mean = hgt_m, sd = hgt_sd)
+# Values three standard deviation away from mean
+pnorm(hgt_m + 3 * hgt_sd, mean = hgt_m, sd = hgt_sd) - 
+  pnorm(hgt_m - 3 * hgt_sd, mean = hgt_m, sd = hgt_sd)
+```
+
+Using normal distribution probability, we can confirm that the heights **follow the 68-95-99.7% rule very closely**.
+
+### 3.22 Defective rate.
+
+$p = 0.02$
+
+a. $P(10th\ transistor\ is\ the\ first\ with\ a\ defect) = (1 - p)^{n-1} p =  (1 - 0.02)^9 * 0.02 = `r (1 - 0.02)^9 * 0.02`$ 
+
+
+b. $P(no\ defects\ in\ a\ batch\ of\ 100) = (1 - p)^{100} = 0.98^{100} = `r 0.98^100`$
+
+
+c. $\mu  = \frac{1}{p} = \frac{1}{0.02} = 50$ and $\sigma = \sqrt{\frac{1-p}{p^2}} = \sqrt{\frac{0.98}{0.0004}} = \sqrt{2450} = `r sqrt(0.98/(0.02^2))`$
+
+
+d. If $p = 0.05$, then $\mu  = \frac{1}{0.05} = 20$ and $\sigma = \sqrt{\frac{0.95}{0.0025}} = `r sqrt(0.95/(0.05^2))`$.
+
+
+e. When probability of an event is higher, the event is more common, so the expected number of trials before it occurs and the standard deviation are lower.
+
+### 3.38 Male children.
+
+a. If $p = 0.51$, $n = 3$ and $k = 2$, then $P(two\ boys\ out\ of\ three\ kids) = \frac{n!}{k!(n-k)!} p^k (1-p)^{n-k} = \frac{3!}{2!} * 0.51^2 * 0.49 = `r 3*(0.51^2)*0.49`$.
+
+
+b. Possible combinations include:
+
+* boy, boy, girl
+* boy, girl, boy
+* girl, boy, boy
+
+<CENTER>
+$P(two\ boys\ out\ of\ three\ kids)$
+
+$=(P(boy)*P(boy)*P(girl))+(P(boy)*P(girl)*P(boy))+(P(girl)*P(boy)*P(boy))$
+
+$=3*0.51*0.51*0.49 = `r 3*0.51*0.51*0.49`$
+</CENTER>
+
+
+c. If using approach b to calculate the probability that a couple with 8 kids has 3 boys, it is first necessary to determine the number of combinations of having 3 boys among 8 kids. The list will be significantly longer than with 3 kids (in fact, there are 56 combinations). With approach a, all that is necessary is just to plug in the numbers into the formula.
+
+### 3.42 Serving in volleyball.
+
+$p = 0.15$
+
+a. This is a negative binomial distribution (serves are independent with each one being either a success or a failure, probability of success is the same for each serve and the last serve is a success) with $n=10$ and $k=3$.
+
+<CENTER>
+$P(3rd\ success\ on\ the\ 10th\ try) = {n-1 \choose k-1} p^k (1-p)^{n-k}$
+$= \frac{9!}{2! * 7!} * 0.15^3 * 0.85^7 = `r (9*8/2)*0.15^3*0.85^7`$
+</CENTER>
+
+
+b. Serves are independent events and previous outcomes have no effect on future events. The probability of the success on the 10th serve is 0.15. 
+
+
+c. Part a is looking for the probability of a specific combination of successes withing 10 serves. Although each serve is independent, we are considering all 10 serves in determining the probability of the desired pattern. Contrary to this part b is only concerned with one serve. Previous outcomes are irrelevant because events are independent. 
