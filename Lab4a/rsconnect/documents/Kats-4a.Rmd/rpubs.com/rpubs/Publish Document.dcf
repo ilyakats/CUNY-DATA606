@@ -1,0 +1,8 @@
+name: Publish Document
+title:
+account: rpubs
+server: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/257808/10c213ffef8742a5b9e280b869abb006
+bundleId: https://api.rpubs.com/api/v1/document/257808/10c213ffef8742a5b9e280b869abb006
+url: http://rpubs.com/ilyakats/257808
+when: 1489298661.55457
