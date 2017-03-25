@@ -1,0 +1,103 @@
+---
+title: "DATA 606 Data Project Proposal"
+author: "Ilya Kats"
+output: pdf_document
+---
+
+### Data Preparation
+
+```{r setup, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+library(foreign)
+library(dplyr)
+library(psych)
+library(ggplot2)
+
+# Load data.
+sspa <- read.dta("G:\\CUNY\\GitHub\\CUNY-DATA606\\Project\\sppa2012_public_stata.dta")
+
+# Select relevant variables.
+arts <- sspa %>% 
+  select(DadEducation = PEE11A, MomEducation = PEE11B, 
+         Concerts = PTC1Q3B, Books = PTC1Q13B) %>% 
+  filter(!is.na(DadEducation) & !is.na(MomEducation) & (!is.na(Books) | !is.na(Concerts)))
+
+# Drop unused factor levels.
+arts$DadEducation <- as.factor(as.character(arts$DadEducation))
+arts$MomEducation <- as.factor(as.character(arts$MomEducation))
+```
+
+
+### Research question 
+
+**You should phrase your research question in a way that matches up with the scope of inference your dataset allows for.**
+
+Is parents' education level predictive of individual's participation in the arts?
+
+
+### Cases 
+
+**What are the cases, and how many are there?**
+
+Each case is an individual responding to the survey. There are 35,735 cases in the data set. There are 2,397 cases with both parents' education level reported and with at least one of response variables available. 
+
+
+### Data collection 
+
+**Describe the method of data collection.**
+
+Data is collected by the [National Endowment for the Arts](https://www.arts.gov) through the survey, *Survey of Public Participation in the Arts (SPPA)*, administered in July 2012 as a supplement to the U.S. Census Bureau's Current Population Survey, and is nationally representative.
+
+
+### Type of study 
+
+**What type of study is this (observational/experiment)?**
+
+This is an observational study.
+
+
+### Data Source 
+
+**If you collected the data, state self-collected. If not, provide a citation/link.**
+
+Data is collected by U.S. Census Bureau on behalf of NEA and is available online here: https://www.arts.gov/publications/additional-materials-related-to-2012-sppa. For the project data was downloaded in STATA format from the NEA site.
+
+NEA Office of Research & Analysis, *[2012 SPPA  Questionnaire](https://www.arts.gov/sites/default/files/sppa-questionnaire-2012.pdf)*.
+
+Triplett, T. (October 2014). *[2012 SPPA Public-Use Data File User's Guide](https://www.arts.gov/sites/default/files/2012-sppa-data-users-guide-revised.pdf)*. Statistical Methods Group. Urban Institute.
+
+
+### Response 
+
+**What is the response variable, and what type is it (numerical/categorical)?**
+
+Two response variable selected for this research are number of classical music performances attended and number of books read in the last 12 months. Both are numerical.
+
+
+### Explanatory 
+
+**What is the explanatory variable, and what type is it (numerical/categorical)?**
+
+Two explanatory variables are the highest degree or level of school completed by father and the highest degree or level of school completed by mother. Both are categorical.
+
+
+### Relevant summary statistics 
+
+**Provide summary statistics relevant to your research question. For example, if you’re comparing means across groups provide means, SDs, sample sizes of each group. This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
+
+```{r}
+describe(arts$Books)
+describe(arts$Concerts)
+
+describeBy(arts$Books, group = arts$DadEducation, mat = TRUE)
+describeBy(arts$Concerts, group = arts$DadEducation, mat = TRUE)
+
+ggplot(data = subset(arts, !is.na(Books)), aes(x = Books)) + 
+  geom_histogram(bins = 15)
+
+ggplot(data = subset(arts, !is.na(Concerts)), aes(x = Concerts)) + 
+  geom_histogram(bins = 15)
+
+table(arts$DadEducation, useNA = "ifany")
+table(arts$MomEducation, useNA = "ifany")
+```
+
