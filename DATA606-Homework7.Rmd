@@ -1,7 +1,7 @@
 ---
 title: "DATA 606 Homework 7"
 author: "Ilya Kats"
-date: "April 22, 2017"
+date: "April 23, 2017"
 output:
   pdf_document: default
   html_document: default
@@ -30,23 +30,24 @@ $s_x = 10.37$, $s_y = 9.41$
 
 $R = 0.67$
 
-a. $b_1 = \frac{s_y}{s_x}R = \frac{171.14}{107.2} * 0.67 = 1.069625$<BR>
+a. $b_1 = \frac{s_y}{s_x}R = \frac{9.41}{10.37} * 0.67 = 0.6079749$<BR>
 $y - \bar{y} = b_1(x - \bar{x})$<BR>
-$y - 171.14 = 1.069625 * (x - 107.2)$<BR>
-$y = 1.069625 * x - 1.069625 * 107.2 + 171.14$<BR>
-$y = 56.4762 + 1.069625 * x$<BR><BR>
+$y - 171.14 = 0.6079749 * (x - 107.2)$<BR>
+$y = 0.6079749 * x - 0.6079749 * 107.2 + 171.14$<BR>
+$y = 105.9651 + 0.6079749 * x$<BR><BR>
 Equation of the regression line:<BR>
-$\widehat{height} = 56.4762 + 1.069625 * shoulder\ girth$
 
-b. The **slope** means that for every additional centimeter of shoulder girth the average height increases by 1.069625 centimeters.<BR>
-The **intercept** means that for a shoulder girth of 0 centimeters, the average height is 56.4762 centimeters (obviously not a realistic point that serves only as a description of the regression line equation).
+$\widehat{height} = 105.9651 + 0.6079749 * shoulder\ girth$
+
+b. The **slope** means that for every additional centimeter of shoulder girth the average height increases by 0.6079749 centimeters.<BR>
+The **intercept** means that for a shoulder girth of 0 centimeters, the average height is 105.9651 centimeters (obviously not a realistic point that serves only as a description of the regression line equation).
 
 c. $R^2 = 0.67^2 = 0.4489$<BR>
 44.89% of the variation in height is explained by shoulder girth. 
 
-d. If $x = 100$, then height is predicted to be $\hat{y} = 56.4762 + 1.069625 * 100 = 163.4387$ cm.
+d. If $x = 100$, then height is predicted to be $\hat{y} = 105.9651 + 0.6079749 * 100 = 166.7626$ cm.
 
-e. The residual is $e_i = y_i - \hat{y} = 160 - 163.4387 = -3.4387$ cm. A negative residual means that the model overestimated the height.
+e. The residual is $e_i = y_i - \hat{y} = 160 - 166.7626 = -6.7626$ cm. A negative residual means that the model overestimated the height.
 
 f. The data covers shoulder girth in the range of about 85 cm to 135 cm. The value of 56 cm lies far outside of the range. It is **not appropriate** to use this linear model to predict the height.
 
