@@ -144,6 +144,7 @@ Key descriptive statistics for the number of books read is as follows:
 books %>% filter(Books > 0) %>% select(Books) %>% describe
 ```
 
+\newpage
 Mosaic plots below illustrate the breakdown between reading and not reading books per dad's and mom's education level. Visually it appears that higher parents' education level increases probability of reading books in adult life.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
@@ -156,6 +157,7 @@ m2 <- grid.grabExpr(mosaic(Read ~ MomEducation, data = books,
 grid.arrange(m1, m2, ncol=2)
 ```
 
+\newpage
 The plot below illustrates the spread of number of books read separated by parents' education level. The relationship (if any) is far less obvious from this representation.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
@@ -177,58 +179,118 @@ books %>%
 
 ### Part 4 - Inference:
 
-```{r eval=FALSE, echo=FALSE, warning=FALSE, message=FALSE}
-hist(log(books$BooksNo))
-qqnorm(books$Books^(1/9))
-qqline(books$Books^(1/9))
+The relationship between the dichotomous dependent variable `Read` is modelled against two independent `DadEducation` and `MomEducation` using logistic regression. Depedent variable and its outcomes are **independent**. One area of concern is that two explanatory variables are not necessarily independent of each other. It is quite possible that individuals seek partners of similar education level. 
 
-?glm
-
-books$BooksNo <- log(books$BooksNo)
-l2 <- lm(books$BooksNo ~ books$DadEducation + books$MomEducation)
-summary(l2)
-
-hist(l2$residuals)
-plot(l2$residuals ~ books$DadEducation , type = "p")
-qqnorm(l2$residuals)
-qqline(l2$residuals)
-
-books$DadEducation <- as.character(books$DadEducation)
-books$DadEducation[books$DadEducation == "01-LessHS"] <- "03-HS"
-books$DadEducation[books$DadEducation == "02-SomeHS"] <- "03-HS"
-books$DadEducation <- as.factor(books$DadEducation)
-books$MomEducation <- as.character(books$MomEducation)
-books$MomEducation[books$MomEducation == "01-LessHS"] <- "03-HS"
-books$MomEducation[books$MomEducation == "02-SomeHS"] <- "03-HS"
-books$MomEducation <- as.factor(books$MomEducation)
-
-g <- glm(books$Read ~ books$MomEducation + books$DadEducation, family = "binomial")
-summary(g)
-
-rl <- lm(residuals(g)~bs(predict(g),8))
-> #rl=loess(residuals(reg)~predict(reg))
-> y=predict(rl,se=TRUE)
-> segments(predict(reg),y$fit+2*y$se.fit,predict(reg),y$fit-2*y$se.fit,col="green")
-
-plot(books$DadEducation, resid)
-plot(predict(g), residuals(g), col=c("blue","red")[1+books$Read])
-abline(h=0,lty=2,col="grey")
-lines(lowess(predict(g),residuals(g)),col="black",lwd=2)
-
-plot(g$residuals ~ books$MomEducation + books$DadEducation)
-plot(abs(residuals(g)) ~ fitted.values(g))
-
-qqnorm(g$residuals)
-plot(books$DadEducation, prob$prob, xlab = "Temperature", ylab = "Probability of Damage")
-curve(predict(g, data.frame(temp=x), type="response"), add=TRUE)
+```{r warning=FALSE, message=FALSE}
+lr <- glm(Read ~ MomEducation + DadEducation, data = books, family = "binomial")
+summary(lr)
 ```
 
+\newpage
+Graphs below illustrate residuals to demonstrate model fit.
 
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+plot(lr$residuals, books$read, 
+     xlab = "Order of Collection", ylab = "Residuals")
 
+plot(lr$fitted.values, lr$residuals, col=c("blue","red")[1+books$Read],
+     xlab = "Fitted Values", ylab = "Residuals")
+abline(h=0,lty=2,col="grey")
+lines(lowess(lr$fitted.values,lr$residuals),col="black",lwd=2)
+```
 
+Looking at logistic regression summary table, it appears that lower education levels - _Less than 9th Grade_ and _Some High School_ - bear no significant relationship with the reading flag. However, higher education levels - from High School to College - are significant in predicting whether an individual is reading books recreationally.
+
+For individuals who do read books, the following analysis checks if there is statistically significant variations in mean values across various education levels. Based on the histogram above in Part 3, the distribution of number of books read is heavily right-skewed and harldy normal. In order to perform the analysis, the data is log-transformed. 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+b <- books %>% 
+  filter(Books > 0)
+
+ggplot(data = b, aes(x = log(Books))) + 
+  geom_histogram(bins = 10) + 
+  xlab("No of Books Read") + ylab("Frequency") + ggtitle("Histogram of No of Books Read (log-transform)")
+
+qqnorm(log(b$Books))
+qqline(log(b$Books))
+```
+
+\newpage
+Below normal probability plots show log-transformed data per each `DadEducation` level.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+op <- par(mfrow=c(2,3))
+for(i in levels(b$DadEducation)){
+  tmp <- with(b, log(Books[DadEducation == i]))
+  qqnorm(tmp, xlab="No of Books",main = i)
+  qqline(tmp)
+}
+par(op)
+```
+
+\newpage
+Below normal probability plots show log-transformed data per each `MomEducation` level.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+op <- par(mfrow=c(2,3))
+for(i in levels(b$MomEducation)){
+  tmp <- with(b, log(Books[MomEducation == i]))
+  qqnorm(tmp, xlab="No of Books",main = i)
+  qqline(tmp)
+}
+par(op)
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+op <- par(mfrow=c(1,2))
+plot(log(b$Books) ~ b$DadEducation, 
+     xlab = "Dad's Education", ylab = "No of Books Read (log-transform)")
+plot(log(b$Books) ~ b$MomEducation, 
+     xlab = "Mom's Education", ylab = "No of Books Read (log-transform)")
+par(op)
+```
+
+Based on the histogram and normal probability plots for log-transformed books data, it is reasonable to state that the distribution within the sample and within each group is **nearly normal** (with perhaps some issues towards the tails). Observations within each group and between groups are **independent**. The boxplots show that variability between groups is very similar. With these assumptions it is appropriate to use **ANOVA**.
+
+$H_0$: The mean number of books read is the same for all levels of **dad's education**.
+
+$H_A$: At least one mean is different. 
+
+```{r warning=FALSE, message=FALSE}
+summary(aov(log(b$Books) ~ b$DadEducation))
+```
+
+Based on the significance level of 0.01, we reject the null hypothesis. Variation in mean number of books read is significantly different between some groups.
+
+$H_0$: The mean number of books read is the same for all levels of **mom's education**.
+
+$H_A$: At least one mean is different. 
+
+```{r warning=FALSE, message=FALSE}
+summary(aov(log(b$Books) ~ b$MomEducation))
+```
+
+The p-value is close to 0, so we reject the null hypothesis. Variation in mean number of books read is significantly different between some groups.
+
+Fitting a linear regression model to the log-transformed data (summary table below), we see that there is little statistically significant relationship between education levels and number of books read (with the exception of mom's higher education levels). Comparing linear regression model to ANOVA results, we see that even though there may be difference between some groups in mean number of books, there is no significant relationship when comparing all observations.
+
+```{r warning=FALSE, message=FALSE}
+l <- lm(log(b$Books) ~ b$DadEducation + b$MomEducation)
+summary(l)
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+qqnorm(l$residuals)
+qqline(l$residuals)
+
+plot(l$residuals, xlab = "Order of Collection", ylab = "Residuals")
+```
+
+Plots above demonstrate that residuals of the model are nearly normal and that there is constant variability. There may be linearity in the data (refer to Part 3) and observations are independent. Conditions for linear regression are satisfied.
 
 ### Part 5 - Conclusion: 
 
+The analysis indicates that parents' education level is a significant predictor of whether an individual will read books recreationally in his or her adult life. Higher education level indicates higher probability of reading books. More surprisingly, parents' education level does not predict the number of books an individual reads. There are possibly other variables that predict how many books an individual reads a year. Further analysis can reveal those. This analysis only considered reading. It may be interesting to see if similar results can be observed in other areas, for example attendance of classical music concerts (and number of concerts attended).
 
 ### References:
 
@@ -238,6 +300,14 @@ Triplett, T. (October 2014). *[2012 SPPA Public-Use Data File User's Guide](http
 
 \newpage
 ### Appendix A (Notes):
+
+It was interesting to work on this assignment with real data and real results (provided my analysis is valid). I have tried to structure this report in a way that may be presented outside of class. This appendix (and appendix B with R code) includes some notes on assignment to show my work and opinions that I would not want included in the report. 
+
+I originally started looking at number of books. After some analysis I realized that I am not seeing any zeros, but there must be people who do not read. The research question is completely different with and without zeros. This data has a significant number of individuals that do not read. This skewed any analysis I tried to do on all data at once. The best solution I could come up with was to separate the research into two questions - whether an individual reads and, if yes, how many books. My research indicates that there are other ways to handle this type of situation. I used logistic regression for the first question and linear regression for the second. I believe there is a way to combine these models, but this is beyond my current abilities.
+
+Quite honestly I found logistic regression challenging. I do feel it was a proper method to use in this situation, but I am still not 100% positive on how to properly test model fit and conditions. 
+
+I think presenting results of the project in class would be interesting. I would like to get my classmates' opinions on my research and see what they were up to. I would enjoy it more and find it more valuable than the exercises we presented over the course. However, creating this report was also very valuable, so I think the output of the assignment should be a report which is then presented to the class. Perhaps the last meetup can be everyone's presentations.
 
 \newpage
 ### Appendix B (Code):
@@ -272,4 +342,139 @@ arts$MomEducation <- as.factor(as.character(arts$MomEducation))
 
 # Save for future use and analysis
 saveRDS(arts, "arts.rds")
+```
+
+The code below was used to load transformed data and further adjust it for analysis.
+
+```{r eval=FALSE}
+library(foreign)
+library(tidyr)
+library(dplyr)
+library(psych)
+library(ggplot2)
+library(vcd)
+library(gridExtra)
+
+knitr::opts_chunk$set(echo = TRUE)
+
+arts <- readRDS("C:\\Temp\\GitHub\\CUNY-DATA606\\Project\\arts.rds")
+
+arts$DadEducation <- as.character(arts$DadEducation)
+arts$DadEducation[arts$DadEducation == "High school graduate (or GED)"] <- "03-HS"
+arts$DadEducation[arts$DadEducation == "Less than 9th grade"] <- "01-LessHS"
+arts$DadEducation[arts$DadEducation == "College graduate (BA, AB, BS)"] <- "05-Undergrad"
+arts$DadEducation[arts$DadEducation == "Some College"] <- "04-SomeUndergrad"
+arts$DadEducation[arts$DadEducation == "Some high school"] <- "02-SomeHS"
+arts$DadEducation[arts$DadEducation == "Advanced or graduate degree"] <- "06-Grad"
+arts$DadEducation <- as.factor(arts$DadEducation)
+
+arts$MomEducation <- as.character(arts$MomEducation)
+arts$MomEducation[arts$MomEducation == "High school graduate (or GED)"] <- "03-HS"
+arts$MomEducation[arts$MomEducation == "Less than 9th grade"] <- "01-LessHS"
+arts$MomEducation[arts$MomEducation == "College graduate (BA, AB, BS)"] <- "05-Undergrad"
+arts$MomEducation[arts$MomEducation == "Some College"] <- "04-SomeUndergrad"
+arts$MomEducation[arts$MomEducation == "Some high school"] <- "02-SomeHS"
+arts$MomEducation[arts$MomEducation == "Advanced or graduate degree"] <- "06-Grad"
+arts$MomEducation <- as.factor(arts$MomEducation)
+
+books <- arts %>% 
+  filter(BooksNo >= 0 & BooksNo < 98) %>% 
+  select(DadEducation, MomEducation, Read = BooksFlag, Books = BooksNo)
+
+books$Read <- as.character(books$Read)
+books$Read[books$Read == "no"] <- "0"
+books$Read[books$Read == "yes"] <- "1"
+books$Read <- as.numeric(books$Read)
+```
+
+Code below was used to generate all plots.
+
+```{r eval = FALSE}
+# Histogram of number of books read
+ggplot(data = filter(books, Books > 0), aes(x = Books)) + 
+  geom_histogram() + 
+  xlab("No of Books Read") + ylab("Frequency") + 
+  ggtitle("Histogram of No of Books Read")
+
+# Mosaic plot of reading flag by education level
+m1 <- grid.grabExpr(mosaic(Read ~ DadEducation, data = books, 
+        labeling_args = list(set_varnames = c(Read = "Did You Read?", 
+                                              DadEducation = "Dad's Education")),
+        set_labels = list(Read = c("No", "Yes"), 
+                          DadEducation = c("1", "2", "3", "4", "5", "6"))))
+m2 <- grid.grabExpr(mosaic(Read ~ MomEducation, data = books, 
+        labeling_args = list(set_varnames = c(Read = "Did You Read?", 
+                                              MomEducation = "Mom's Education")),
+        set_labels = list(Read = c("No", "Yes"), 
+                          MomEducation = c("1", "2", "3", "4", "5", "6"))))
+grid.arrange(m1, m2, ncol=2)
+
+# Scatterplot and boxplots of number of books by education level
+books %>% 
+  filter(Books > 0) %>% 
+  select(Dad = DadEducation, Mom = MomEducation, Books) %>% 
+  gather(Education, Level, Dad:Mom) %>% 
+  ggplot(aes(x = Level, y = Books, shape = Education)) + 
+  geom_point(aes(color = Education), 
+             position = position_jitterdodge(dodge.width = 0.8)) +  
+  geom_boxplot(fill = "white", 
+               outlier.colour = NA, 
+               position = position_dodge(width=0.8), 
+               width = 0.25, 
+               show.legend = FALSE) + 
+  xlab("Education Level") + ylab("Books Read") + 
+  ggtitle("Plot of No of Books Read by Education Level") + 
+  theme(legend.position="bottom")
+  
+# Residuals plots for logistic regression
+plot(lr$residuals, books$read, 
+     xlab = "Order of Collection", ylab = "Residuals")
+
+plot(lr$fitted.values, lr$residuals, col=c("blue","red")[1+books$Read],
+     xlab = "Fitted Values", ylab = "Residuals")
+abline(h=0,lty=2,col="grey")
+lines(lowess(lr$fitted.values,lr$residuals),col="black",lwd=2)
+
+# Log-transform plots for number of books
+b <- books %>% 
+  filter(Books > 0)
+
+ggplot(data = b, aes(x = log(Books))) + 
+  geom_histogram(bins = 10) + 
+  xlab("No of Books Read") + ylab("Frequency") + 
+  ggtitle("Histogram of No of Books Read (log-transform)")
+
+qqnorm(log(b$Books))
+qqline(log(b$Books))
+
+# Normal probability plots for education levels
+op <- par(mfrow=c(2,3))
+for(i in levels(b$DadEducation)){
+  tmp <- with(b, log(Books[DadEducation == i]))
+  qqnorm(tmp, xlab="No of Books",main = i)
+  qqline(tmp)
+}
+par(op)
+
+op <- par(mfrow=c(2,3))
+for(i in levels(b$MomEducation)){
+  tmp <- with(b, log(Books[MomEducation == i]))
+  qqnorm(tmp, xlab="No of Books",main = i)
+  qqline(tmp)
+}
+par(op)
+
+# Boxplots for number of books by education level
+op <- par(mfrow=c(1,2))
+plot(log(b$Books) ~ b$DadEducation, 
+     xlab = "Dad's Education", ylab = "No of Books Read (log-transform)")
+plot(log(b$Books) ~ b$MomEducation, 
+     xlab = "Mom's Education", ylab = "No of Books Read (log-transform)")
+par(op)
+
+# Residuals plots for linear regression
+qqnorm(l$residuals)
+qqline(l$residuals)
+
+plot(l$residuals, xlab = "Order of Collection", ylab = "Residuals")
 ```
